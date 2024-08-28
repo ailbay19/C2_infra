@@ -1,0 +1,7 @@
+#!/bin/bash
+
+docker load -i app.tar
+docker load -i fs.tar
+
+docker network create --driver bridge c2bridge
+

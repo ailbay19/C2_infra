@@ -1,0 +1,4 @@
+#!/bin/bash
+
+lsof -ti :18080 | xargs kill -9
+lsof -ti :18081 | xargs kill -9

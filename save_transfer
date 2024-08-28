@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm ./vm_servers/*.tar
+
+docker save -o ./vm_servers/app.tar app
+docker save -o ./vm_servers/fs.tar fs
+
+scp -P 14555 -r vm_servers user@localhost:/home/user

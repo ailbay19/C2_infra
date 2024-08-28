@@ -1,0 +1,20 @@
+#!/bin/bash
+
+COMMAND1="flask --app app run --port 18080"
+COMMAND2="flask --app app run --port 18081"
+
+# Define the child directories
+DIR1="./app_server/"
+DIR2=./"file_server/"
+
+PIPE1="APP_PIPE"
+PIPE2="FS_PIPE"
+
+mkfifo "$PIPE1"
+mkfifo "$PIPE2"
+
+# Open the first terminal and run the command in the first child directory
+gnome-terminal -- bash -c "cd '$DIR1' && $COMMAND1 > '$PIPE1'; exec bash"
+
+# Open the second terminal and run the command in the second child directory
+gnome-terminal -- bash -c "cd '$DIR2' && $COMMAND2 > '$PIPE2'; exec bash"
