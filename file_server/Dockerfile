@@ -9,4 +9,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py app.py
 COPY file_manager.py file_manager.py
 
-CMD ["flask", "--app", "app", "run", "--port", "18081"]
+EXPOSE 18081
+
+CMD ["flask", "--app", "app", "run", "--host", "0.0.0.0", "--port", "18081"]
