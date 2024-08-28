@@ -15,6 +15,13 @@ We have an app_server for outside requests, and a file_server for internal file 
 - On root, it sends 204 if there are no files on the queue. Otherwise sends the file.
 - On GET /upload, we have a simple upload html. With POST /upload, we can upload the file.
 
+### NGINX
+
+- Runs on port 80.
+- Proxy server is configured as app:18080, where app is docker container name.
+- Currently runs on the same bridge network as App and FS servers. Otherwise change nginx.conf to point to an ip.
+- Other VM's on the same network can access ports 80, 18080, 18081. Other ports should be closed.
+
 ## Scripts
 
 ### Local
