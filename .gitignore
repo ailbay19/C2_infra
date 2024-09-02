@@ -1,2 +1,6 @@
 __pycache__/
 vm_servers/*.tar
+
+ssl/
+*.crt
+*.key
