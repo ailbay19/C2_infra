@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker run -d --name app --network c2bridge -p 18080:18080 app
-docker run -d --name fs --network c2bridge -p 18081:18081 fs
+docker run -d --name app --network c2bridge app
+docker run -d --name nginx --network c2bridge -p 80:80 nginx

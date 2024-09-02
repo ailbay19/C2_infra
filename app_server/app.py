@@ -1,32 +1,69 @@
-from flask import Flask, make_response, send_file
+from flask import Flask, make_response, send_file, request, redirect
 
-import requests
+from file_manager import FileManager
 import io
 
 
 app = Flask(__name__)
-
-app.config["FS"] = "http://fs:18081"
-
-fs_url = app.config["FS"]
+fm = FileManager()
 
 @app.route("/")
 def root():
-    
-    res = ""
-    
-    file_res = requests.get(fs_url)
-    
-    
-    if file_res.status_code == 200:
-        file = io.BytesIO(file_res.content)
-        filename = file_res.headers.get('Content-Disposition')[21:]
+    response = ""
+
+    file_resource = fm.get()
+    if file_resource:
+        file = io.BytesIO(file_resource["file"])
+        name = file_resource["filename"]
         
-        res = send_file(file, as_attachment=True, download_name=filename)
-        
-        res.headers.set('Server', 'NGINX')
+        response = send_file(file, as_attachment = True, download_name = name)
     
-    return make_response(res, 200)
+        return make_response(response, 200)
+    
+    else:
+        return make_response(response, 204)
+
+
+
+
+
+@app.route("/upload", methods = ['GET', 'POST'])
+def upload():
+    if request.method == 'GET':
+        response =  '''
+                        <!DOCTYPE html>
+                        <form method="post" enctype="multipart/form-data">
+                            <input type="file" name="file" />
+                            <input type="submit" value="Upload" />
+                        </form>
+                    '''
+                    
+        
+        return make_response(response, 200)
+    
+    if request.method == 'POST':
+        response = ""
+        
+        if 'file' not in request.files:
+            return redirect(request.url)
+        
+        file = request.files['file']
+
+        if file.filename == '':
+            return redirect(request.url)
+
+        if not file:
+            return redirect(request.url)
+        
+        data = file.stream.read()
+        
+
+        file_res = fm.put(data)
+        if file_res:
+            response = file_res["filename"]
+            return make_response(response, 201)
+        else:
+            return make_response(response, 400)
 
 
 if __name__ == "__main__":
