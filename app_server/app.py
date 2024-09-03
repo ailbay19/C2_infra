@@ -16,7 +16,7 @@ def send_result():
     if request.content_type == 'application/octet-stream':
         data = request.data.decode('utf-8')
     else:
-        data = request.get_data(as_text=True)
+        return make_response(400)
     
     request_id = request.headers.get('id', None)
     
