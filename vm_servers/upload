@@ -16,6 +16,6 @@ if [ ! -f "$FILENAME" ]; then
 fi
 
 # Define the URL to post to
-URL="http://localhost:80/upload"
+URL="https://localhost:443/upload"
 
-curl -X POST -F "file=@$FILEPATH" "$URL"
+curl -X POST -F "file=@$FILEPATH" --cert ./ssl/client.crt --key ./ssl/client.key --cacert ./ssl/server.crt "$URL"
