@@ -4,3 +4,6 @@ vm_servers/*.tar
 ssl/
 *.crt
 *.key
+
+client/client
+.vscode/

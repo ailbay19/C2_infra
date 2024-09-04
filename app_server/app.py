@@ -8,6 +8,10 @@ from datetime import datetime
 app = Flask(__name__)
 fm = FileManager()
 
+@app.route("/", methods=['GET'])
+def root():
+    return make_response("Hello", 200)
+
 @app.route("/send_result", methods = ['POST'])
 def send_result():
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+scp -P 14500 ./client/client user@localhost:/home/user
