@@ -7,7 +7,8 @@ COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY app.py app.py
-COPY file_manager.py file_manager.py
+COPY bin bin
+COPY logs logs 
 
 EXPOSE 18080
 

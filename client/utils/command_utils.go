@@ -45,6 +45,7 @@ func handleExecute(cmd string) {
 		return
 	}
 
-	// Print the command's output
-	fmt.Println(string(output))
+	SendResults(output)
+
+	fmt.Printf("Sent results\n, %s", output)
 }

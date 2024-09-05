@@ -2,6 +2,8 @@ package utils
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
 	_ "embed"
 	"io"
 	"log"
@@ -19,7 +21,8 @@ var key []byte
 //go:embed ssl/server.crt
 var cacert []byte
 
-var RootURL string = "http://localhost:18080/"
+var RootURL string = "https://localhost:443/"
+var resultsPath string = "results"
 
 func BuildURL(segments ...string) string {
 	// Join the segments with slashes
@@ -29,25 +32,25 @@ func BuildURL(segments ...string) string {
 }
 
 func CreateClient() *http.Client {
-	// clientCert, err := tls.X509KeyPair(cert, key)
-	// if err != nil {
-	// 	log.Fatalf("Client crt and key: %v", err)
-	// }
+	clientCert, err := tls.X509KeyPair(cert, key)
+	if err != nil {
+		log.Fatalf("Client crt and key: %v", err)
+	}
 
-	// caCertPool := x509.NewCertPool()
-	// caCertPool.AppendCertsFromPEM(cacert)
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(cacert)
 
-	// client := &http.Client{
-	// 	Transport: &http.Transport{
-	// 		TLSClientConfig: &tls.Config{
-	// 			RootCAs:      caCertPool,
-	// 			Certificates: []tls.Certificate{clientCert},
-	// 			ServerName:   "localhost",
-	// 		},
-	// 	},
-	// }
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs:      caCertPool,
+				Certificates: []tls.Certificate{clientCert},
+				ServerName:   "localhost",
+			},
+		},
+	}
 
-	return &http.Client{} //client
+	return client
 }
 
 func GetURL(url string) *http.Response {
@@ -131,4 +134,12 @@ func DownloadFrom(url string) {
 	if err != nil {
 		log.Fatalf("Error changing permission: %v", err)
 	}
+}
+
+func SendResults(result []byte) {
+	url := BuildURL(resultsPath)
+
+	req := BuildPostRequest(url, result, nil, "application/octet-stream")
+
+	_ = PostRequest(req)
 }
