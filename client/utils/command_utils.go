@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"fmt"
 	"log"
+	"os/exec"
 )
 
 func HandleCommand(result map[string]interface{}) {
@@ -35,5 +37,14 @@ func handleDownload(url string) {
 }
 
 func handleExecute(cmd string) {
-	panic("unimplemented")
+	command := exec.Command(cmd)
+
+	output, err := command.Output()
+	if err != nil {
+		fmt.Println("Error executing command:", err)
+		return
+	}
+
+	// Print the command's output
+	fmt.Println(string(output))
 }

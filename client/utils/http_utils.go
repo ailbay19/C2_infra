@@ -126,4 +126,9 @@ func DownloadFrom(url string) {
 
 	// TODO: send acknowledgment?
 
+	// Always make executable?
+	err = os.Chmod(filename, 0755)
+	if err != nil {
+		log.Fatalf("Error changing permission: %v", err)
+	}
 }

@@ -46,6 +46,8 @@ func main() {
 	for {
 		time.Sleep(time.Duration(rand.Intn(max_sleep_seconds)))
 		checkCommands()
+		time.Sleep(time.Duration(rand.Intn(max_sleep_seconds)))
+		checkCommands()
 		return
 	}
 
