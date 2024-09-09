@@ -1,9 +1,11 @@
 __pycache__/
-vm_servers/*.tar
+server_docker/*.tar
 
 ssl/
-*.crt
 *.key
 
 client/client
 .vscode/
+
+nebula/**/nebula
+nebula/**/nebula-cert

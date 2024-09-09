@@ -1,8 +1,0 @@
-#!/bin/bash
-
-rm ./vm_servers/*.tar
-
-docker save -o ./vm_servers/app.tar app
-docker save -o ./vm_servers/nginx.tar nginx
-
-scp -P 14500 -r vm_servers user@localhost:/home/user
