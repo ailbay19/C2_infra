@@ -80,9 +80,9 @@ def root():
     
     client_id = request.headers.get('X-Client-ID')
     
-    # Initialize client if no id set.
+    # Initialize client if no id set. Client reads 201.
     if not client_id:
-        response = make_response("", 200)
+        response = make_response("", 201)
         client_id = generate_random_string(8)
         response.headers.add("X-Client-ID", client_id)
         
@@ -148,7 +148,12 @@ def download_file(filename):
 def save_results():
     data = request.data
     
-    filename = f"{get_timestamp()}.txt"
+    client_id = request.headers.get("X-Client-ID")
+    if not client_id:
+        return make_response("", 400)
+    
+    
+    filename = f"{client_id}_{get_timestamp()}.txt"
     
     filepath = os.path.join(LOGS_DIR, filename)
     
