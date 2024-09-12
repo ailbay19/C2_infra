@@ -42,5 +42,6 @@ func handleExecute(cmd string) {
 		return
 	}
 
-	SendResults(output)
+	results := append([]byte(cmd+"\n"), output...)
+	SendResults(results)
 }

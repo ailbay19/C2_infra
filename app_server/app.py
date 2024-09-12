@@ -1,4 +1,5 @@
 from flask import Flask, make_response, send_file, request, jsonify, abort
+from werkzeug.utils import secure_filename
 import os
 from collections import deque
 from datetime import datetime
@@ -134,11 +135,11 @@ def split_file(filename):
     
 @app.route("/download/<filename>", methods = ['GET'])
 def download_file(filename):
-    chunks = split_file(filename)
+    chunks = split_file(secure_filename(filename))
     
     def generate():
         for chunk in chunks:
-            # time.sleep(random.randint(1,3))
+            time.sleep(random.randint(1,3))
             yield chunk
     
     return generate(), {"Content-Type": "application/octet-stream"}
